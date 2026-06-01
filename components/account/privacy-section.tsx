@@ -52,6 +52,9 @@ export function PrivacySection({ isHidden, onChange }: PrivacySectionProps) {
                         <p className="text-sm font-medium text-foreground">
                             Profil fotoğrafımı herkese gizle
                         </p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                            Profil fotoğrafınız diğer kullanıcılara gösterilmez.
+                        </p>
                     </div>
                     <Switch
                         checked={isHidden}

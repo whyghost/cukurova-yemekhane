@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import { Bookmark, Trash2, ArrowLeft, Loader2, Eye, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { TablePagination } from "@/components/ui/table-pagination"
 import { toast } from "sonner"
 import { toTitleCase } from "@/lib/utils"
 import { Header } from "@/components/header"
@@ -23,6 +24,21 @@ export default function FavorilerimPage() {
     const [favorites, setFavorites] = useState<FavoriteItem[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [selectedMeal, setSelectedMeal] = useState<{ id: string; name: string } | null>(null)
+    const [currentPage, setCurrentPage] = useState(1) // 1 tabanlı
+    const [pageSize, setPageSize] = useState(5)
+
+    const totalPages = Math.max(1, Math.ceil(favorites.length / pageSize))
+    const paginatedFavorites = favorites.slice(
+        (currentPage - 1) * pageSize,
+        (currentPage - 1) * pageSize + pageSize
+    )
+
+    // Favori sayısı veya sayfa boyutu değişince (örn. silme) geçerli sayfayı sınırlar içinde tut
+    useEffect(() => {
+        if (currentPage > totalPages) {
+            setCurrentPage(totalPages)
+        }
+    }, [currentPage, totalPages])
 
     useEffect(() => {
         if (session?.user) {
@@ -153,7 +169,7 @@ export default function FavorilerimPage() {
                     </Card>
                 ) : (
                     <div className="space-y-2">
-                        {favorites.map((fav) => (
+                        {paginatedFavorites.map((fav) => (
                             <Card
                                 key={fav.mealName}
                                 className="bg-card px-3 py-2.5 flex flex-row items-center justify-between gap-3"
@@ -181,6 +197,22 @@ export default function FavorilerimPage() {
                                 </div>
                             </Card>
                         ))}
+
+                        {/* Pagination */}
+                        {favorites.length > 0 && (
+                            <TablePagination
+                                page={currentPage}
+                                pageSize={pageSize}
+                                totalItems={favorites.length}
+                                onPageChange={setCurrentPage}
+                                onPageSizeChange={(size) => {
+                                    setPageSize(size)
+                                    setCurrentPage(1)
+                                }}
+                                pageSizeOptions={[5, 10, 20, 30]}
+                                className="pt-2"
+                            />
+                        )}
                     </div>
                 )}
             </div>

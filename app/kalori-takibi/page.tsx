@@ -102,14 +102,6 @@ function getGoalStatusLabel(totalCalories: number, goal: number | null): string 
     return "Hedefin altında"
 }
 
-function getGoalStatusBadgeClass(totalCalories: number, goal: number | null): string {
-    if (!goal) return "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-    const ratio = totalCalories / goal
-    if (ratio >= 1) return "bg-red-500/10 text-red-600 dark:text-red-400"
-    if (ratio >= 0.75) return "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-    return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-}
-
 const CARDS_PER_PAGE_DESKTOP = 5
 const CARDS_PER_PAGE_MOBILE = 4
 
@@ -409,9 +401,9 @@ export default function KaloriTakibiPage() {
                                 />
 
                                 {/* Meal List */}
-                                <Card className="bg-card flex flex-col gap-0">
-                                    <div className="px-4 pt-3 pb-1">
-                                        <span className="text-sm font-medium text-muted-foreground">
+                                <Card className="bg-card overflow-hidden flex flex-col gap-0">
+                                    <div className="bg-muted/20 px-4 py-2.5 border-b border-border/40 flex items-center">
+                                        <span className="text-sm font-medium text-foreground">
                                             Yenilen Yemekler
                                         </span>
                                     </div>
@@ -473,9 +465,14 @@ export default function KaloriTakibiPage() {
                                         )}
                                     </div>
                                     {selectedLog.consumedMeals.length > 0 && (
-                                        <div className="border-t border-border/40 px-4 py-2.5 mt-auto flex items-center justify-between">
+                                        <div className="border-t border-border/40 bg-muted/50 px-4 py-2.5 mt-auto flex items-center justify-between">
                                             <span className="text-xs text-muted-foreground">Toplam Kalori</span>
-                                            <Badge variant="secondary" className={`font-mono font-semibold text-[10px] h-5 px-2.5 ${getGoalStatusBadgeClass(selectedLog.totalCalories, calorieGoal)}`}>
+                                            <Badge variant="secondary" className="gap-1.5 font-mono font-normal text-[10px] h-5 px-2 text-muted-foreground bg-secondary/50">
+                                                <span
+                                                    aria-hidden
+                                                    className="size-1.5 rounded-full shrink-0 aspect-square"
+                                                    style={{ backgroundColor: getGoalStatusColor(selectedLog.totalCalories, calorieGoal) }}
+                                                />
                                                 {selectedLog.totalCalories} kcal
                                             </Badge>
                                         </div>
@@ -619,7 +616,6 @@ interface BigDonutCardProps {
 function BigDonutCard({ log, calorieGoal, chartData, chartConfig }: BigDonutCardProps) {
     const statusColor = getGoalStatusColor(log.totalCalories, calorieGoal)
     const statusLabel = getGoalStatusLabel(log.totalCalories, calorieGoal)
-    const badgeClass = getGoalStatusBadgeClass(log.totalCalories, calorieGoal)
 
     return (
         <Card className="bg-card flex flex-col gap-0">
@@ -681,13 +677,19 @@ function BigDonutCard({ log, calorieGoal, chartData, chartConfig }: BigDonutCard
                         {isToday(log.date) ? "Bugün" : formatDateLabel(log.date)}
                     </p>
                     {isToday(log.date) && (
-                        <Badge variant="secondary" className="text-[10px] h-5 px-2 bg-primary/10 text-primary">
+                        <Badge variant="secondary" className="gap-1.5 text-[10px] h-5 px-2 text-muted-foreground bg-secondary/50">
+                            <span aria-hidden className="size-1.5 rounded-full shrink-0 aspect-square bg-primary" />
                             Bugün
                         </Badge>
                     )}
                 </div>
                 {statusLabel && (
-                    <Badge variant="secondary" className={`text-[10px] h-5 px-2 ${badgeClass}`}>
+                    <Badge variant="secondary" className="gap-1.5 text-[10px] h-5 px-2 text-muted-foreground bg-secondary/50">
+                        <span
+                            aria-hidden
+                            className="size-1.5 rounded-full shrink-0 aspect-square"
+                            style={{ backgroundColor: statusColor }}
+                        />
                         {statusLabel}
                     </Badge>
                 )}
